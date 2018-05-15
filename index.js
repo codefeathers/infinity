@@ -91,10 +91,10 @@ const infiniteList = {
 		};
 
 		// Clear cache manually.
-		clearCache = () => (cache = [], undefined);
+		const clearCache = () => (cache = [], undefined);
 
-		top = function () { return this.get(0) };
-		end = function () { return this.get(Infinity) };
+		const top = function () { return this.get(0) };
+		const end = function () { return this.get(Infinity) };
 		const returns = {
 			get,
 			take,
