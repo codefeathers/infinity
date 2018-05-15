@@ -4,15 +4,14 @@ const infiniteList = {
 	/**
 	 * InfiniteList Constructor. Iterates infinitely until index value is found.
 	 * 
-	 * @param {any} start 
-	 * @param {any} next 
-	 * @param {any} limit 
-	 * @returns 
+	 * @param {any} start
+	 * @param {any} next
+	 * @returns InfiniteLinkedListItem object
 	 */
-	create (start, next, limit) {
+	create (start, next) {
 
 		// Closure magic!
-		const cache = [];
+		let cache = [];
 		let j = 0;
 
 		// Get list item of index i
@@ -28,18 +27,8 @@ const infiniteList = {
 				|| Number.isNaN(i)
 			) return;
 
-			// Cache limiting. If cache becomes larger
-			// than limit, deletes non-empty first item
-			//TODO: FIX: Does not minCache is always 1,
-			// and cache length doesn't decrease more than 1
-			let minCache;
-			if (cache.length > (limit || 10000))
-				for (const cacheIndex in cache) {
-					delete cache[cacheIndex];
-					minCache = cacheIndex + 1;
-					break;
-				}
-
+			//TODO: Cache limiting. (Removed after unexpected behaviour)
+			
 			// Initializing first item if it doesn't exist
 			if(!cache[0]) cache[0] = start;
 
@@ -77,8 +66,7 @@ const infiniteList = {
 				return obj;
 			}
 
-			// If i doesn't exist in cache // Only works in forward
-			//TODO: FIX
+			// If i doesn't exist in cache
 			if(!(i in cache)) {
 				if(cache.length <= i && (cache.length - 1) in cache)
 					while (cache.length <= i)
@@ -92,13 +80,18 @@ const infiniteList = {
 		const take = (from, to) => {
 			const arr = [];
 			let source, target;
+			// "from" number of elements
 			if(!to) { source = 0; target = from; }
-			else ({ from: source, to: target} = { from, to });
+			// "target" is the end index!
+			else { source = from; target = to + 1 };
 			for(let i = source; i < target; i ++) {
 				arr.push(get(i));
 			};
 			return arr;
 		};
+
+		// Clear cache manually.
+		clearCache = () => (cache = [], undefined);
 
 		top = function () { return this.get(0) };
 		end = function () { return this.get(Infinity) };
@@ -109,6 +102,7 @@ const infiniteList = {
 			first: top,
 			end,
 			last: end,
+			clearCache,
 			[Symbol.iterator]: () => ({
 				next: () => ({
 					done: false,
