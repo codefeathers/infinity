@@ -1,12 +1,35 @@
 const always = x => _ => x;
 
+class InfiniteListItem {
+	constructor (list, value, index) {
+		this.value = value,
+		this.index = index,
+		this.next = () => list.get(index + 1),
+		this.previous = () => list.get(index - 1),
+		this[Symbol.iterator] = () => ({
+			next: () => ({
+				done: false,
+				value: list.get(index + 1)
+			})
+		}),
+		this.toString = () => {
+			const val = list.get(i).value;
+			return ( 'InfiniteListItem [ ..., '
+				+ ((typeof val === 'object' && val !== null)
+					? JSON.stringify(val, null, 2)
+					: val.toString())
+				+ ', ... ]' )
+		}
+	}
+}
+
 const infiniteList = {
 	/**
 	 * InfiniteList Constructor. Iterates infinitely until index value is found.
 	 * 
 	 * @param {any} start
 	 * @param {any} next
-	 * @returns InfiniteLinkedListItem object
+	 * @returns InfiniteList instance
 	 */
 	create (start, next) {
 
@@ -32,39 +55,11 @@ const infiniteList = {
 			// Initializing first item if it doesn't exist
 			if(!cache[0]) cache[0] = start;
 
-			// Create returnable object
-			const obj = {
-					next: () => this.get(i+1),
-					previous: () => this.get(i - 1),
-					[Symbol.iterator]: () => ({
-						next: () => ({
-							done: false,
-							value: this.get(i+1)
-						})
-					}),
-					toString: () => {
-						const val = get(i).value;
-						return ( 'InfiniteLinkedListItem [ ..., '
-							+ ((typeof val === 'object' && val !== null)
-								? JSON.stringify(val, null, 2)
-								: val.toString())
-							+ ', ... ]' )
-					}
-				}
-
 			// If index were to be infinity, value and index are infinity
-			if(i === Infinity) {
-				obj.value = Infinity;
-				obj.index = Infinity;
-				return obj;
-			}
+			if(i === Infinity) return new InfiniteListItem(this, Infinity, Infinity)
 
 			// If index exists in cache, return the value
-			if(i in cache) {
-				obj.value = cache[i];
-				obj.index = i;
-				return obj;
-			}
+			if(i in cache) return new InfiniteListItem(this, cache[i], i);
 
 			// If i doesn't exist in cache
 			if(!(i in cache)) {
@@ -72,9 +67,7 @@ const infiniteList = {
 					while (cache.length <= i)
 						cache[cache.length] = next(cache[cache.length - 1]);
 			}
-			obj.value = cache[i];
-			obj.index = i;
-			return obj;
+			return new InfiniteListItem(this, cache[i], i);
 		}
 
 		const take = (from, to) => {
@@ -109,10 +102,13 @@ const infiniteList = {
 					value: get(j++)
 				})
 			}),
-			toString: () => 'InfiniteLinkedList [ ' + take(0, 10).map(x => (' ' + x.value.toString())) + ' ... ]'
+			toString: () => 'InfiniteList [ '
+				+ take(0, 10).map(x => (' ' + x.value.toString()))
+				+ ' ... ]'
 		};
 		return returns;
 	}
 }
 
 module.exports = infiniteList;
+module.exports.InfiniteListItem = InfiniteListItem;
