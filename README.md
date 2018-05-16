@@ -2,7 +2,9 @@
 
 ## Infinity
 
-Create infinite lists in JavaScript.
+Create infinite linked lists in JavaScript. Each item is linked to the next and previous item.
+
+This can also be used as an n<sup>th</sup> generator with a pure interface (see [example](#example)).
 
 ## Installation
 
@@ -15,7 +17,7 @@ npm install --save @codefeathers/infinity
 In the browser:
 
 ```HTML
-<script src="https://unpkg.com/@codefeathers/iseq">
+<script src="https://unpkg.com/@codefeathers/infinity">
 ```
 
 ## Usage
@@ -26,7 +28,7 @@ const infinity = new InfiniteList(<start>, <next>);
 // Gets item at index
 infinity.get(<index>);
 
-// Returns array of InfiniteListItems from index 0 to given number
+// Returns array of given number of InfiniteListItems from index 0
 infinity.take(<number>);
 
 // Returns array of InfiniteListItems from index startIndex to endIndex
