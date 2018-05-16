@@ -127,6 +127,30 @@ class InfiniteList {
 				};
 			};
 		}
+
+		if(typeof Proxy !== 'undefined')
+			return new Proxy(this, {
+				get: (obj, key) => {
+					if(key in obj) return obj[key];
+					const index = (
+						typeof key === 'string' && /^\d*$/g.test(key)
+					) ? parseInt(key) : undefined;
+					if(index) return obj['get'](index);
+				},
+				has: (obj, key) => {
+					const index = (
+						typeof key === 'string' && /^\d*$/g.test(key)
+					) ? parseInt(key) : undefined;
+					return (
+						(key in obj) ||
+						(areNumbers(index) &&
+							(index % 1 === 0) &&
+							(index >= 0))
+					)
+				},
+				enumerate: obj => obj.keys(),
+				ownKeys: obj => obj.keys(),
+			})
 	}
 }
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const InfiniteList = require('../es5/infinity.min');
+const InfiniteList = require('../es6');
 
 const {
 	InfiniteListItem
@@ -40,7 +40,7 @@ describe("InfiniteList", () => {
 
 	it("Should be true", () => {
 		const Infinite = new InfiniteList(0, x => x + 2);
-		expect(Infinite.get(5) instanceof InfiniteListItem).toBe(true);
+		expect((Infinite.get(5)) instanceof InfiniteListItem).toBe(true);
 	});
 
 	it("Should be 22", () => {
