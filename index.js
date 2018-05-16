@@ -16,9 +16,9 @@ const { always, isNonZeroFalsy, stringify, areNumbers } = require('./utils');
 class InfiniteListItem {
 	/**
 	 * Creates an instance of InfiniteListItem.
-	 * @param {any} list Parent list, instance of InfiniteList
-	 * @param {any} value Current value
-	 * @param {any} index Current index
+	 * @param {*} list Parent list, instance of InfiniteList
+	 * @param {Number} value Current value
+	 * @param {Number} index Current index
 	 * @memberof InfiniteListItem
 	 */
 	constructor(list, value, index) {
@@ -31,12 +31,12 @@ class InfiniteListItem {
 		if (typeof Symbol !== 'undefined' && Symbol.iterator) {
 			/**
 			 * ES6 Symbol.iterator
-			 * @returns {Iterable.<*>}
+			 * @returns {Iterable.<InfiniteListItem>}
 			 */
 			this[Symbol.iterator] = () => ({
 				next: () => ({
-					done: false,
-					value: list.get(index + 1)
+					value: list.get(index + 1),
+					done: false
 				})
 			});
 		}
@@ -45,6 +45,7 @@ class InfiniteListItem {
 	/**
 	 * toString method for pretty printing InfiniteListItem instance.
 	 * @returns {String} Decycled and beautified string
+	 * @memberof InfiniteListItem
 	 */
 	toString() {
 		return ('InfiniteListItem [ .. ' +
@@ -62,6 +63,7 @@ class InfiniteList {
 	 * @param {*} start Starting value
 	 * @param {Function} next Function to find next item
 	 * Accepts current value and optionally previous value
+	 * @memberof InfiniteList
 	 * @constructs InfiniteList
 	 */
 	constructor(start, next) {
@@ -74,6 +76,7 @@ class InfiniteList {
 		 * Get InfiniteListItem at index.
 		 * @param {Number} index A non-negative integer representing index
 		 * @returns {InfiniteListItem}
+		 * @memberof InfiniteList
 		 */
 		this.get = function (index) {
 
@@ -99,7 +102,10 @@ class InfiniteList {
 			if (!(index in cache)) {
 				if (cache.length <= index && (cache.length - 1) in cache)
 					while (cache.length <= index)
-						cache[cache.length] = next(cache[cache.length - 1], cache[cache.length - 2]);
+						cache[cache.length] = next(
+								cache[cache.length - 1],
+								cache[cache.length - 2]
+							);
 			}
 			return new InfiniteListItem(this, cache[index], index);
 		}
@@ -109,6 +115,7 @@ class InfiniteList {
 		 * Forces destroy reference to cache, and creates a new cache.
 		 * Old cache will be GC'd.
 		 * @returns {undefined}
+		 * @memberof InfiniteList
 		 */
 		this.clearCache = () => (cache = [], undefined);
 
@@ -116,13 +123,14 @@ class InfiniteList {
 		if (typeof Symbol !== 'undefined' && Symbol.iterator) {
 			/**
 			 * ES6 Symbol.iterator
-			 * @returns {Iterable.<*>}
+			 * @returns {Iterable.<InfiniteListItem>}
+			 * @memberof InfiniteList
 			 */
 			this[Symbol.iterator] = function () {
 				return {
 					next: () => ({
-						done: false,
-						value: this.get(j++)
+						value: this.get(j++),
+						done: false
 					})
 				};
 			};
@@ -135,6 +143,7 @@ class InfiniteList {
  * @param {Number} from Number of elements or starting index
  * @param {Number} to Optional ending index
  * @returns {Array<InfiniteListItem>} An array of InfiniteListItems
+ * @memberof InfiniteList
  */
 InfiniteList.prototype.take = function (from, to) {
 	const arr = [];
@@ -165,6 +174,7 @@ InfiniteList.prototype.take = function (from, to) {
 /**
  * Returns first element of InfiniteList.
  * @returns {InfiniteListItem} Instance of InfiniteListItem
+ * @memberof InfiniteList
  */
 InfiniteList.prototype.top = function () {
 	return this.get(0);
@@ -173,6 +183,7 @@ InfiniteList.prototype.top = function () {
 /**
  * Returns last element of InfiniteList (Infinity).
  * @returns {InfiniteListItem} Instance of InfiniteListItem
+ * @memberof InfiniteList
  */
 InfiniteList.prototype.end = function () {
 	return this.get(Infinity);
@@ -182,6 +193,7 @@ InfiniteList.prototype.end = function () {
  * toString method for pretty printing InfiniteList instance.
  * Snips at 2 elements for arrays and objects, or 5 elements otherwise.
  * @returns {String} Pretty printed InfiniteList
+ * @memberof InfiniteList
  */
 InfiniteList.prototype.toString = function () {
 	const length = typeof this.first() === 'object' ? 2 : 5;
