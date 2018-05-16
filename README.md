@@ -72,5 +72,5 @@ log(fibonacci.get(50).next().value); // -> 20365011074
 log(fibonacci.get(50).next(5).value); // -> 139583862445
 
 // To Infinity and beyond!
-log(fibonacci.last(50).value); // -> Infinity
+log(fibonacci.last().value); // -> Infinity
 ```
