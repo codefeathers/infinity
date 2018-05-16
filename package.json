@@ -1,10 +1,13 @@
 {
-  "name": "@codefeathers/infinite",
-  "version": "0.1.0",
+  "name": "@codefeathers/infinity",
+  "version": "0.2.0",
   "description": "Infinitely generating linked list with memoisation (or an n-generator)",
-  "main": "index.js",
+  "main": "es5/infinity.min.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine",
+    "build": "./build.sh && jasmine",
+    "prepublishOnly": "npm run build",
+    "release": "npm run build && npm publish"
   },
   "keywords": [
     "infinite",
@@ -14,5 +17,11 @@
     "generators"
   ],
   "author": "Muthu Kumar <@MKRhere> (https://mkr.pw)",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "browserify": "^16.2.2",
+    "uglify-js": "^3.3.25"
+  }
 }
