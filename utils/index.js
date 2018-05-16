@@ -1,3 +1,5 @@
+'use strict';
+
 const JSON = require('./cycle');
 
 const always = x => _ => x;

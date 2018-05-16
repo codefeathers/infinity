@@ -28,6 +28,9 @@ const infinity = new InfiniteList(<start>, <next>);
 // Gets item at index
 infinity.get(<index>);
 
+// Equivalent to the above! (Modern browsers and node only)
+infinity[<index>];
+
 // Returns array of given number of InfiniteListItems from index 0
 infinity.take(<number>);
 
@@ -46,6 +49,7 @@ You can pass in any starting value. `infinity` cheerfully ignores what you pass 
 `InfiniteList` is iterable.
 
 ```JavaScript
+// (Modern browsers and node only)
 for (let item of infinity) {
 	// Remember to have an exit condition
 	console.log(item);
@@ -66,6 +70,9 @@ log(fibonacci.take(10).map(x => x.value)); // -> [ 0, 1, 1, 2, 3, 5, 8, 13, 21, 
 
 // What's the 50th item?
 log(fibonacci.get(50).value); // -> 12586269025
+
+// This is equivalent of the above! (modern browsers only!)
+log(fibonacci[50].value); // -> 12586269025
 
 // What's the next item?
 log(fibonacci.get(50).next().value); // -> 20365011074
