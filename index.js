@@ -1,114 +1,206 @@
-const always = x => _ => x;
+/**
+ * ∞
+ * Infinity: Create infinitely generating lists in JavaScript.
+ * @version 0.2.0
+ * @author Muthu Kumar (MKRhere)
+ */
 
+// Utils
+const { always, isNonZeroFalsy, stringify, areNumbers } = require('./utils');
+
+/**
+ * An item of the InfiniteList class. Created when calling .get(n) on an InfiniteList.
+ * Exposed for instanceof utility sake. Not to be called directly.
+ * @class InfiniteListItem
+ */
 class InfiniteListItem {
-	constructor (list, value, index) {
-		this.value = value,
-		this.index = index,
-		this.next = () => list.get(index + 1),
-		this.previous = () => list.get(index - 1),
-		this[Symbol.iterator] = () => ({
-			next: () => ({
-				done: false,
-				value: list.get(index + 1)
-			})
-		}),
-		this.toString = () => {
-			const val = list.get(i).value;
-			return ( 'InfiniteListItem [ ..., '
-				+ ((typeof val === 'object' && val !== null)
-					? JSON.stringify(val, null, 2)
-					: val.toString())
-				+ ', ... ]' )
+	/**
+	 * Creates an instance of InfiniteListItem.
+	 * @param {any} list Parent list, instance of InfiniteList
+	 * @param {any} value Current value
+	 * @param {any} index Current index
+	 * @memberof InfiniteListItem
+	 */
+	constructor(list, value, index) {
+		this.value = value;
+		this.index = index;
+		this.next = z => (!z ? list.get(index + 1) : list.get(index + z));
+		this.previous = z => (!z ? list.get(index - 1) : list.get(index - z));
+
+		// Check if Symbol exists
+		if (typeof Symbol !== 'undefined' && Symbol.iterator) {
+			/**
+			 * ES6 Symbol.iterator
+			 * @returns {Iterable.<*>}
+			 */
+			this[Symbol.iterator] = () => ({
+				next: () => ({
+					done: false,
+					value: list.get(index + 1)
+				})
+			});
 		}
 	}
+
+	/**
+	 * toString method for pretty printing InfiniteListItem instance.
+	 * @returns {String} Decycled and beautified string
+	 */
+	toString() {
+		return ('InfiniteListItem [ .. ' +
+			stringify(this.value) +
+			' .. ]')
+	};
 }
 
-const infiniteList = {
+class InfiniteList {
 	/**
-	 * InfiniteList Constructor. Iterates infinitely until index value is found.
-	 * 
-	 * @param {any} start
-	 * @param {any} next
-	 * @returns InfiniteList instance
+	 * InfiniteList Constructor.
+	 * Iterates infinitely until index value is found.
+	 * Stores cache in closure so when the same index is requested again,
+	 * it's returned immediately.
+	 * @param {*} start Starting value
+	 * @param {Function} next Function to find next item
+	 * Accepts current value and optionally previous value
+	 * @constructs InfiniteList
 	 */
-	create (start, next) {
+	constructor(start, next) {
 
 		// Closure magic!
 		let cache = [];
 		let j = 0;
 
-		// Get list item of index i
-		function get(i) {
+		/**
+		 * Get InfiniteListItem at index.
+		 * @param {Number} index A non-negative integer representing index
+		 * @returns {InfiniteListItem}
+		 */
+		this.get = function (index) {
 
 			// Validation
-			if(
-				// i is a falsy value except 0
-				(!i && i !== 0)
-				// is not a number
-				|| (typeof i !== 'number')
-				// is... not a number
-				|| Number.isNaN(i)
+			if (
+				// i is a non-zero falsy value, or is negative
+				(isNonZeroFalsy(index) || index < 0)
+				|| !areNumbers(index)
 			) return;
 
-			//TODO: Cache limiting. (Removed after unexpected behaviour)
-			
+			//TODO: Cache limiting. (Removed for unexpected behaviour)
+
 			// Initializing first item if it doesn't exist
-			if(!cache[0]) cache[0] = start;
+			if (!cache[0]) cache[0] = start;
 
 			// If index were to be infinity, value and index are infinity
-			if(i === Infinity) return new InfiniteListItem(this, Infinity, Infinity)
+			if (index === Infinity) return new InfiniteListItem(this, Infinity, Infinity)
 
 			// If index exists in cache, return the value
-			if(i in cache) return new InfiniteListItem(this, cache[i], i);
+			if (index in cache) return new InfiniteListItem(this, cache[index], index);
 
 			// If i doesn't exist in cache
-			if(!(i in cache)) {
-				if(cache.length <= i && (cache.length - 1) in cache)
-					while (cache.length <= i)
-						cache[cache.length] = next(cache[cache.length - 1]);
+			if (!(index in cache)) {
+				if (cache.length <= index && (cache.length - 1) in cache)
+					while (cache.length <= index)
+						cache[cache.length] = next(cache[cache.length - 1], cache[cache.length - 2]);
 			}
-			return new InfiniteListItem(this, cache[i], i);
+			return new InfiniteListItem(this, cache[index], index);
 		}
 
-		const take = (from, to) => {
-			const arr = [];
-			let source, target;
-			// "from" number of elements
-			if(!to) { source = 0; target = from; }
-			// "target" is the end index!
-			else { source = from; target = to + 1 };
-			for(let i = source; i < target; i ++) {
-				arr.push(get(i));
+		/**
+		 * Clear cache manually.
+		 * Forces destroy reference to cache, and creates a new cache.
+		 * Old cache will be GC'd.
+		 * @returns {undefined}
+		 */
+		this.clearCache = () => (cache = [], undefined);
+
+		// Check if Symbol exists
+		if (typeof Symbol !== 'undefined' && Symbol.iterator) {
+			/**
+			 * ES6 Symbol.iterator
+			 * @returns {Iterable.<*>}
+			 */
+			this[Symbol.iterator] = function () {
+				return {
+					next: () => ({
+						done: false,
+						value: this.get(j++)
+					})
+				}
 			};
-			return arr;
-		};
-
-		// Clear cache manually.
-		const clearCache = () => (cache = [], undefined);
-
-		const top = function () { return this.get(0) };
-		const end = function () { return this.get(Infinity) };
-		const returns = {
-			get,
-			take,
-			top,
-			first: top,
-			end,
-			last: end,
-			clearCache,
-			[Symbol.iterator]: () => ({
-				next: () => ({
-					done: false,
-					value: get(j++)
-				})
-			}),
-			toString: () => 'InfiniteList [ '
-				+ take(0, 10).map(x => (' ' + x.value.toString()))
-				+ ' ... ]'
-		};
-		return returns;
+		}
 	}
 }
 
-module.exports = infiniteList;
+/**
+ * Takes a given number of elements from the InfiniteList.
+ * @param {Number} from Number of elements or starting index
+ * @param {Number} to Optional ending index
+ * @returns {Array<InfiniteListItem>} An array of InfiniteListItems
+ */
+InfiniteList.prototype.take = function (from, to) {
+	const arr = [];
+
+	if(
+		isNonZeroFalsy(from)
+		|| (from === 0 && isNonZeroFalsy(to)) // Take 0 elements?
+		|| (!areNumbers(from) && isNonZeroFalsy(to))
+	) return arr;
+
+	let source, target;
+	// "from" number of elements
+	if (isNonZeroFalsy(to)) {
+		source = 0;
+		target = from;
+	}
+	// "target" is the end index!
+	else {
+		source = from;
+		target = to + 1
+	};
+
+	for (let i = source; i < target; i++) {
+		arr.push(this.get(i));
+	};
+	return arr;
+};
+
+/**
+ * Returns first element of InfiniteList.
+ * @returns {InfiniteListItem} Instance of InfiniteListItem
+ */
+InfiniteList.prototype.top = function () {
+	return this.get(0)
+};
+
+/**
+ * Returns last element of InfiniteList (Infinity).
+ * @returns {InfiniteListItem} Instance of InfiniteListItem
+ */
+InfiniteList.prototype.end = function () {
+	return this.get(Infinity)
+};
+
+/**
+ * toString method for pretty printing InfiniteList instance.
+ * Snips at 2 elements for arrays and objects, or 5 elements otherwise.
+ * @returns {String} Pretty printed InfiniteList
+ */
+InfiniteList.prototype.toString = function () {
+	const length = typeof this.first() === 'object' ? 2 : 5;
+	return [
+			'InfiniteList [',
+			this
+			.take(length)
+			.map(x => (' ' + stringify(x.value))) +
+			',',
+			'... ]'
+		]
+		.join(' ');
+}
+
+/* Convenience methods */
+InfiniteList.prototype.first = InfiniteList.prototype.top;
+InfiniteList.prototype.last = InfiniteList.prototype.end;
+
+// Exports
+module.exports = InfiniteList;
 module.exports.InfiniteListItem = InfiniteListItem;
