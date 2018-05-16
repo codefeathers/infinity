@@ -211,20 +211,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				var source = void 0,
 				    target = void 0;
-				// "from" number of elements
 				if (isNonZeroFalsy(to)) {
+					// "from" number of elements
 					source = 0;
 					target = from;
-				}
-				// "target" is the end index!
-				else {
-						source = from;
-						target = to + 1;
-					};
+				} else {
+					// "target" is the end index!
+					source = from;
+					target = to + 1;
+				};
 
 				for (var i = source; i < target; i++) {
 					arr.push(this.get(i));
-				};
+				}
 				return arr;
 			};
 

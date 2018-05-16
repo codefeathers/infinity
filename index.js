@@ -50,7 +50,7 @@ class InfiniteListItem {
 		return ('InfiniteListItem [ .. ' +
 			stringify(this.value) +
 			' .. ]')
-	};
+	}
 }
 
 class InfiniteList {
@@ -90,7 +90,7 @@ class InfiniteList {
 			if (!cache[0]) cache[0] = start;
 
 			// If index were to be infinity, value and index are infinity
-			if (index === Infinity) return new InfiniteListItem(this, Infinity, Infinity)
+			if (index === Infinity) return new InfiniteListItem(this, Infinity, Infinity);
 
 			// If index exists in cache, return the value
 			if (index in cache) return new InfiniteListItem(this, cache[index], index);
@@ -124,7 +124,7 @@ class InfiniteList {
 						done: false,
 						value: this.get(j++)
 					})
-				}
+				};
 			};
 		}
 	}
@@ -146,20 +146,19 @@ InfiniteList.prototype.take = function (from, to) {
 	) return arr;
 
 	let source, target;
-	// "from" number of elements
 	if (isNonZeroFalsy(to)) {
+		// "from" number of elements
 		source = 0;
 		target = from;
-	}
-	// "target" is the end index!
-	else {
+	} else {
+		// "target" is the end index!
 		source = from;
 		target = to + 1
 	};
 
 	for (let i = source; i < target; i++) {
 		arr.push(this.get(i));
-	};
+	}
 	return arr;
 };
 
@@ -168,7 +167,7 @@ InfiniteList.prototype.take = function (from, to) {
  * @returns {InfiniteListItem} Instance of InfiniteListItem
  */
 InfiniteList.prototype.top = function () {
-	return this.get(0)
+	return this.get(0);
 };
 
 /**
@@ -176,7 +175,7 @@ InfiniteList.prototype.top = function () {
  * @returns {InfiniteListItem} Instance of InfiniteListItem
  */
 InfiniteList.prototype.end = function () {
-	return this.get(Infinity)
+	return this.get(Infinity);
 };
 
 /**
@@ -195,7 +194,7 @@ InfiniteList.prototype.toString = function () {
 			'... ]'
 		]
 		.join(' ');
-}
+};
 
 /* Convenience methods */
 InfiniteList.prototype.first = InfiniteList.prototype.top;
