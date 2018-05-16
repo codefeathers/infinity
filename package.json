@@ -4,10 +4,11 @@
   "description": "Infinitely generating linked list with memoisation (or an n-generator)",
   "main": "es5/infinity.min.js",
   "scripts": {
-    "test": "jasmine",
-    "build": "./build.sh && jasmine",
-    "prepublishOnly": "npm run build",
-    "release": "npm run build && npm publish"
+    "build": "./build.sh",
+    "test:es6": "NODE_ENV=development jasmine",
+    "test:es5": "NODE_ENV=production npm run build && jasmine",
+    "test": "npm run test:es6 && npm run test:es5",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "infinite",

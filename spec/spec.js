@@ -1,10 +1,11 @@
 'use strict';
 
-const InfiniteList = require('../es6');
+const path = '..' + (process.env.NODE_ENV === 'development' ? '/es6' : '/es5/infinity.min.js');
 
-const {
-	InfiniteListItem
-} = require('..');
+const InfiniteList = require(path);
+const { InfiniteListItem } = require(path);
+
+console.log(`\nTesting ${path}\n`);
 
 String.prototype.trimify = function() {
 	return this.replace(/\s/g, '');
@@ -40,7 +41,7 @@ describe("InfiniteList", () => {
 
 	it("Should be true", () => {
 		const Infinite = new InfiniteList(0, x => x + 2);
-		expect((Infinite.get(5)) instanceof InfiniteListItem).toBe(true);
+		expect(Infinite.get(5) instanceof InfiniteListItem).toBe(true);
 	});
 
 	it("Should be 22", () => {
