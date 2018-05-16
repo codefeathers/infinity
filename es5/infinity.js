@@ -62,9 +62,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			var InfiniteListItem = function () {
 				/**
      * Creates an instance of InfiniteListItem.
-     * @param {any} list Parent list, instance of InfiniteList
-     * @param {any} value Current value
-     * @param {any} index Current index
+     * @param {*} list Parent list, instance of InfiniteList
+     * @param {Number} value Current value
+     * @param {Number} index Current index
      * @memberof InfiniteListItem
      */
 				function InfiniteListItem(list, value, index) {
@@ -83,14 +83,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					if (typeof Symbol !== 'undefined' && Symbol.iterator) {
 						/**
        * ES6 Symbol.iterator
-       * @returns {Iterable.<*>}
+       * @returns {Iterable.<InfiniteListItem>}
        */
 						this[Symbol.iterator] = function () {
 							return {
 								next: function next() {
 									return {
-										done: false,
-										value: list.get(index + 1)
+										value: list.get(index + 1),
+										done: false
 									};
 								}
 							};
@@ -101,6 +101,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				/**
      * toString method for pretty printing InfiniteListItem instance.
      * @returns {String} Decycled and beautified string
+     * @memberof InfiniteListItem
      */
 
 
@@ -123,6 +124,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     * @param {*} start Starting value
     * @param {Function} next Function to find next item
     * Accepts current value and optionally previous value
+    * @memberof InfiniteList
     * @constructs InfiniteList
     */
 			function InfiniteList(start, next) {
@@ -136,6 +138,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      * Get InfiniteListItem at index.
      * @param {Number} index A non-negative integer representing index
      * @returns {InfiniteListItem}
+     * @memberof InfiniteList
      */
 				this.get = function (index) {
 
@@ -169,6 +172,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      * Forces destroy reference to cache, and creates a new cache.
      * Old cache will be GC'd.
      * @returns {undefined}
+     * @memberof InfiniteList
      */
 				this.clearCache = function () {
 					return cache = [], undefined;
@@ -178,7 +182,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (typeof Symbol !== 'undefined' && Symbol.iterator) {
 					/**
       * ES6 Symbol.iterator
-      * @returns {Iterable.<*>}
+      * @returns {Iterable.<InfiniteListItem>}
+      * @memberof InfiniteList
       */
 					this[Symbol.iterator] = function () {
 						var _this = this;
@@ -186,13 +191,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						return {
 							next: function next() {
 								return {
-									done: false,
-									value: _this.get(j++)
+									value: _this.get(j++),
+									done: false
 								};
 							}
 						};
 					};
 				}
+
+				if (typeof Proxy !== 'undefined') return new Proxy(this, {
+					get: function get(obj, key) {
+						if (key in obj) return obj[key];
+						var index = typeof key === 'string' && /^\d*$/g.test(key) ? parseInt(key) : undefined;
+						if (index) return obj['get'](index);
+					},
+					has: function has(obj, key) {
+						var index = typeof key === 'string' && /^\d*$/g.test(key) ? parseInt(key) : undefined;
+						return key in obj || areNumbers(index) && index % 1 === 0 && index >= 0;
+					},
+					enumerate: function enumerate(obj) {
+						return obj.keys();
+					},
+					ownKeys: function ownKeys(obj) {
+						return obj.keys();
+					}
+				});
 			};
 
 			/**
@@ -200,6 +223,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     * @param {Number} from Number of elements or starting index
     * @param {Number} to Optional ending index
     * @returns {Array<InfiniteListItem>} An array of InfiniteListItems
+    * @memberof InfiniteList
     */
 
 
@@ -230,6 +254,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			/**
     * Returns first element of InfiniteList.
     * @returns {InfiniteListItem} Instance of InfiniteListItem
+    * @memberof InfiniteList
     */
 			InfiniteList.prototype.top = function () {
 				return this.get(0);
@@ -238,6 +263,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			/**
     * Returns last element of InfiniteList (Infinity).
     * @returns {InfiniteListItem} Instance of InfiniteListItem
+    * @memberof InfiniteList
     */
 			InfiniteList.prototype.end = function () {
 				return this.get(Infinity);
@@ -247,6 +273,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     * toString method for pretty printing InfiniteList instance.
     * Snips at 2 elements for arrays and objects, or 5 elements otherwise.
     * @returns {String} Pretty printed InfiniteList
+    * @memberof InfiniteList
     */
 			InfiniteList.prototype.toString = function () {
 				var length = _typeof(this.first()) === 'object' ? 2 : 5;
@@ -434,6 +461,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			module.exports = JSON;
 		}, {}], 3: [function (require, module, exports) {
+			'use strict';
+
 			var JSON = require('./cycle');
 
 			var always = function always(x) {

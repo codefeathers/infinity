@@ -1,6 +1,6 @@
 {
   "name": "@codefeathers/infinity",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Infinitely generating linked list with memoisation (or an n-generator)",
   "main": "es5/infinity.min.js",
   "scripts": {
