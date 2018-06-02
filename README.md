@@ -23,6 +23,11 @@ In the browser:
 ## Usage
 
 ```JavaScript
+// Initialise a new InfiniteList using the constructor.
+// `start` is any value.
+// `next` is a pure function that accepts current
+// (and optionally previous) value in the series
+
 const infinity = new InfiniteList(<start>, <next>);
 
 // Gets item at index
