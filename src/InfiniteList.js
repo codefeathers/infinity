@@ -6,54 +6,8 @@
  */
 
 // Utils
-const { always, isNonZeroFalsy, stringify, areNumbers } = require('./utils');
-
-/**
- * An item of the InfiniteList class. Created when calling .get(n) on an InfiniteList.
- * Exposed for instanceof utility sake. Not to be called directly.
- * @class InfiniteListItem
- */
-class InfiniteListItem {
-	/**
-	 * Creates an instance of InfiniteListItem.
-	 * @param {*} list Parent list, instance of InfiniteList
-	 * @param {Number} value Current value
-	 * @param {Number} index Current index
-	 * @memberof InfiniteListItem
-	 */
-	constructor(list, value, index) {
-		this.__list__ = list;
-		this.value = value;
-		this.index = index;
-		this.next = z => (!z ? this.__list__.get(index + 1) : this.__list__.get(index + z));
-		this.previous = z => (!z ? this.__list__.get(index - 1) : this.__list__.get(index - z));
-	}
-}
-
-// Check if environment supports Symbol
-if (typeof Symbol !== 'undefined' && Symbol.iterator) {
-	/**
-	 * ES6 Symbol.iterator
-	 * @returns {Iterable.<InfiniteListItem>}
-	 */
-	InfiniteListItem.prototype[Symbol.iterator] = () => ({
-		next: () => ({
-			value: this.__list__.get(index + 1),
-			done: false
-		})
-	});
-}
-
-/**
- * toString method for pretty printing InfiniteListItem instance.
- * @returns {String} Decycled and beautified string
- * @memberof InfiniteListItem
- */
-InfiniteListItem.prototype.toString = function () {
-	return ('InfiniteListItem [ .. ' +
-			stringify(this.value) +
-			' .. ]');
-};
+const { always, isNonZeroFalsy, stringify, areNumbers } = require('../utils');
+const InfiniteListItem = require('./InfiniteListItem');
 
 class InfiniteList {
 	/**
@@ -69,6 +23,7 @@ class InfiniteList {
 	 */
 	constructor(start, next) {
 
+		/* Private properties */
 		this.__start__ = start;
 		this.__next__ = next;
 		this.__cache__ = [];
@@ -246,4 +201,3 @@ InfiniteList.prototype.last = InfiniteList.prototype.end;
 
 // Exports
 module.exports = InfiniteList;
-module.exports.InfiniteListItem = InfiniteListItem;
