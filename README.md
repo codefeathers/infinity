@@ -28,25 +28,25 @@ In the browser:
 // `next` is a pure function that accepts current
 // (and optionally previous) value in the series
 
-const infinity = new InfiniteList(<start>, <next>);
+const infinity = new InfiniteList(<start:Number>, <next:Function>);
 
 // Gets item at index
-infinity.get(<index>);
+infinity.get(<index:Number>);
 
 // Equivalent to the above! (Modern browsers and node only)
-infinity[<index>];
+infinity[<index:Number>];
 
 // Returns array of given number of InfiniteListItems from index 0
-infinity.take(<number>);
+infinity.take(<number:Number>);
 
 // Returns array of InfiniteListItems from index startIndex to endIndex
-infinity.take(<startIndex>, <endIndex>);
+infinity.take(<startIndex:Number>, <endIndex:Number>);
 
 // Get InfiniteListItem at next index. Optional number of indices to move ahead
-infinity.get(<index>).next([number]);
+infinity.get(<index:Number>).next(<number:Number>);
 
 // Get InfiniteListItem at previous index. Optional number of indices to move backward
-infinity.get(<index>).previous([number]);
+infinity.get(<index:Number>).previous(<number:Number>);
 ```
 
 You can pass in any starting value. `infinity` cheerfully ignores what you pass in there. The `next` function gets current value and (optionally) previous value as arguments to find next value.
