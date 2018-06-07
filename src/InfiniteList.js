@@ -6,7 +6,7 @@
  */
 
 // Utils
-const { always, isNonZeroFalsy, stringify, areNumbers } = require('../utils');
+const { isNonZeroFalsy, stringify, areNumbers } = require('../utils');
 const InfiniteListItem = require('./InfiniteListItem');
 
 class InfiniteList {
