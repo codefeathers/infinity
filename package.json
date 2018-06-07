@@ -1,28 +1,28 @@
 {
-  "name": "@codefeathers/infinity",
-  "version": "0.3.0",
-  "description": "Infinitely generating linked list with memoisation (or an n-generator)",
-  "main": "es5/infinity.min.js",
-  "scripts": {
-    "build": "./build.sh",
-    "test:es6": "NODE_ENV=development jasmine",
-    "test:es5": "NODE_ENV=production npm run build && jasmine",
-    "test": "npm run test:es6 && npm run test:es5",
-    "prepublishOnly": "npm test"
-  },
-  "keywords": [
-    "infinite",
-    "list",
-    "data structure",
-    "datatypes",
-    "generators"
-  ],
-  "author": "Muthu Kumar <@MKRhere> (https://mkr.pw)",
-  "license": "MIT",
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "browserify": "^16.2.2",
-    "uglify-js": "^3.3.25"
-  }
+	"name": "@codefeathers/infinity",
+	"version": "0.4.0",
+	"description": "Infinitely generating linked list with memoisation (or an n-generator)",
+	"main": "es5/infinity.min.js",
+	"scripts": {
+		"build": "./build.sh",
+		"test:es6": "NODE_ENV=development jasmine",
+		"test:es5": "NODE_ENV=production npm run build && jasmine",
+		"test": "npm run test:es6 && npm run test:es5",
+		"prepublishOnly": "npm test"
+	},
+	"keywords": [
+		"infinite",
+		"list",
+		"data structure",
+		"datatypes",
+		"generators"
+	],
+	"author": "Muthu Kumar <@MKRhere> (https://mkr.pw)",
+	"license": "MIT",
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-preset-env": "^1.7.0",
+		"browserify": "^16.2.2",
+		"uglify-js": "^3.3.25"
+	}
 }

@@ -22,37 +22,38 @@ class InfiniteListItem {
 	 * @memberof InfiniteListItem
 	 */
 	constructor(list, value, index) {
+		this.__list__ = list;
 		this.value = value;
 		this.index = index;
-		this.next = z => (!z ? list.get(index + 1) : list.get(index + z));
-		this.previous = z => (!z ? list.get(index - 1) : list.get(index - z));
-
-		// Check if Symbol exists
-		if (typeof Symbol !== 'undefined' && Symbol.iterator) {
-			/**
-			 * ES6 Symbol.iterator
-			 * @returns {Iterable.<InfiniteListItem>}
-			 */
-			this[Symbol.iterator] = () => ({
-				next: () => ({
-					value: list.get(index + 1),
-					done: false
-				})
-			});
-		}
-	}
-
-	/**
-	 * toString method for pretty printing InfiniteListItem instance.
-	 * @returns {String} Decycled and beautified string
-	 * @memberof InfiniteListItem
-	 */
-	toString() {
-		return ('InfiniteListItem [ .. ' +
-			stringify(this.value) +
-			' .. ]')
+		this.next = z => (!z ? this.__list__.get(index + 1) : this.__list__.get(index + z));
+		this.previous = z => (!z ? this.__list__.get(index - 1) : this.__list__.get(index - z));
 	}
 }
+
+// Check if environment supports Symbol
+if (typeof Symbol !== 'undefined' && Symbol.iterator) {
+	/**
+	 * ES6 Symbol.iterator
+	 * @returns {Iterable.<InfiniteListItem>}
+	 */
+	InfiniteListItem.prototype[Symbol.iterator] = () => ({
+		next: () => ({
+			value: this.__list__.get(index + 1),
+			done: false
+		})
+	});
+}
+
+/**
+ * toString method for pretty printing InfiniteListItem instance.
+ * @returns {String} Decycled and beautified string
+ * @memberof InfiniteListItem
+ */
+InfiniteListItem.prototype.toString = function () {
+	return ('InfiniteListItem [ .. ' +
+			stringify(this.value) +
+			' .. ]');
+};
 
 class InfiniteList {
 	/**
@@ -68,73 +69,9 @@ class InfiniteList {
 	 */
 	constructor(start, next) {
 
-		// Closure magic!
-		let cache = [];
-		let j = 0;
-
-		/**
-		 * Get InfiniteListItem at index.
-		 * @param {Number} index A non-negative integer representing index
-		 * @returns {InfiniteListItem}
-		 * @memberof InfiniteList
-		 */
-		this.get = function (index) {
-
-			// Validation
-			if (
-				// i is a non-zero falsy value, or is negative
-				(isNonZeroFalsy(index) || index < 0)
-				|| !areNumbers(index)
-			) return;
-
-			//TODO: Cache limiting. (Removed for unexpected behaviour)
-
-			// Initializing first item if it doesn't exist
-			if (!cache[0]) cache[0] = start;
-
-			// If index were to be infinity, value and index are infinity
-			if (index === Infinity) return new InfiniteListItem(this, Infinity, Infinity);
-
-			// If index exists in cache, return the value
-			if (index in cache) return new InfiniteListItem(this, cache[index], index);
-
-			// If i doesn't exist in cache
-			if (!(index in cache)) {
-				if (cache.length <= index && (cache.length - 1) in cache)
-					while (cache.length <= index)
-						cache[cache.length] = next(
-								cache[cache.length - 1],
-								cache[cache.length - 2]
-							);
-			}
-			return new InfiniteListItem(this, cache[index], index);
-		}
-
-		/**
-		 * Clear cache manually.
-		 * Forces destroy reference to cache, and creates a new cache.
-		 * Old cache will be GC'd.
-		 * @returns {undefined}
-		 * @memberof InfiniteList
-		 */
-		this.clearCache = () => (cache = [], undefined);
-
-		// Check if Symbol exists
-		if (typeof Symbol !== 'undefined' && Symbol.iterator) {
-			/**
-			 * ES6 Symbol.iterator
-			 * @returns {Iterable.<InfiniteListItem>}
-			 * @memberof InfiniteList
-			 */
-			this[Symbol.iterator] = function () {
-				return {
-					next: () => ({
-						value: this.get(j++),
-						done: false
-					})
-				};
-			};
-		}
+		this.__start__ = start;
+		this.__next__ = next;
+		this.__cache__ = [];
 
 		if(typeof Proxy !== 'undefined')
 			return new Proxy(this, {
@@ -161,6 +98,77 @@ class InfiniteList {
 			})
 	}
 }
+
+// Check if Symbol exists
+if (typeof Symbol !== 'undefined' && Symbol.iterator) {
+	/**
+	 * ES6 Symbol.iterator
+	 * @returns {Iterable.<InfiniteListItem>}
+	 * @memberof InfiniteList
+	 */
+	InfiniteList.prototype[Symbol.iterator] = function () {
+		let j = 0;
+		return {
+			next: () => ({
+				value: this.get(j++),
+				done: false
+			})
+		};
+	};
+}
+
+/**
+ * Get InfiniteListItem at index.
+ * @param {Number} index A non-negative integer representing index
+ * @returns {InfiniteListItem}
+ * @memberof InfiniteList
+ */
+InfiniteList.prototype.get = function (index) {
+
+	// Validation
+	if (
+		// i is a non-zero falsy value, or is negative
+		(isNonZeroFalsy(index) || index < 0)
+		|| !areNumbers(index)
+	) return;
+
+	const start = this.__start__;
+	const next = this.__next__;
+	const cache = this.__cache__;
+
+	//TODO: Cache limiting. (Removed for unexpected behaviour)
+
+	// Initializing first item if it doesn't exist
+	if (!cache[0]) cache[0] = start;
+
+	// If index were to be infinity, value and index are infinity
+	if (index === Infinity) return new InfiniteListItem(this, Infinity, Infinity);
+
+	// If index exists in cache, return the value
+	if (index in cache) return new InfiniteListItem(this, cache[index], index);
+
+	// If i doesn't exist in cache
+	if (!(index in cache)) {
+		if (cache.length <= index && (cache.length - 1) in cache)
+			while (cache.length <= index)
+				cache[cache.length] = next(
+						cache[cache.length - 1],
+						cache[cache.length - 2]
+					);
+	}
+	return new InfiniteListItem(this, cache[index], index);
+}
+
+/**
+ * Clear cache manually.
+ * Forces destroy reference to cache, and creates a new cache.
+ * Old cache will be GC'd.
+ * @returns {undefined}
+ * @memberof InfiniteList
+ */
+InfiniteList.prototype.clearCache = function () {
+	this.__cache__ = [];
+};
 
 /**
  * Takes a given number of elements from the InfiniteList.
