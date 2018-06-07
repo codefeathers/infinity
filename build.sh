@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Browserifying..."
-npx browserify ./index.js -s isEq > ./es5/infinity.temp.js
+npx browserify ./es6/index.js -s isEq > ./es5/infinity.temp.js
 echo "Babelifying..."
 npx babel ./es5/infinity.temp.js --presets=env -o ./es5/infinity.js
 echo "Minifying output..."
