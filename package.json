@@ -5,8 +5,8 @@
 	"main": "es5/infinity.min.js",
 	"scripts": {
 		"build": "./build.sh",
-		"test:es6": "NODE_ENV=development jasmine",
-		"test:es5": "NODE_ENV=production npm run build && jasmine",
+		"test:es6": "NODE_ENV=development npx jasmine",
+		"test:es5": "NODE_ENV=production npm run build && npx jasmine",
 		"test": "npm run test:es6 && npm run test:es5",
 		"prepublishOnly": "npm test"
 	},

@@ -29,8 +29,8 @@ const handler = {
 				(index >= 0))
 		)
 	},
-	enumerate: obj => obj.keys(),
-	ownKeys: obj => obj.keys(),
+	enumerate: obj => Object.keys(obj),
+	ownKeys: obj => Object.keys(obj),
 };
 
 class InfiniteList {

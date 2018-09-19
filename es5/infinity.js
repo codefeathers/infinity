@@ -66,10 +66,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					return key in obj || areNumbers(index) && index % 1 === 0 && index >= 0;
 				},
 				enumerate: function enumerate(obj) {
-					return obj.keys();
+					return Object.keys(obj);
 				},
 				ownKeys: function ownKeys(obj) {
-					return obj.keys();
+					return Object.keys(obj);
 				}
 			};
 
